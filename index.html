@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="chart"></canvas>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+</body>
+<script>
+    let ctx = document.getElementById('chart').getContext('2d');
+
+    let yearsToTeams = {
+        "1932": "המשטרה הבריטית",
+        "1934": "הפועל תל אביב",
+        "1935": "הפועל תל אביב",
+        "1936": "מכבי תל אביב",
+        "1937": "מכבי תל אביב",
+        "1938": "הפועל תל אביב",
+        "1940": "הפועל תל אביב",
+        "1942": "מכבי תל אביב",
+        "1944": "הפועל תל אביב",
+        "1945": "הפועל תל אביב",
+        "1947": "מכבי תל אביב",
+        "1950": "מכבי תל אביב",
+        "1952": "מכבי תל אביב",
+        "1954": "מכבי תל אביב",
+        "1955": "הפועל פתח תקווה",
+        "1956": "מכבי תל אביב",
+        "1957": "הפועל תל אביב",
+        "1958": "מכבי תל אביב",
+        "1959": "הפועל פתח תקווה",
+        "1960": "הפועל פתח תקווה",
+        "1961": "הפועל פתח תקווה",
+        "1962": "הפועל פתח תקווה",
+        "1963": "הפועל פתח תקווה",
+        "1964": "הפועל רמת גן",
+        "1965": "הכח רמת גן",
+        "1966": "הפועל תל אביב",
+        "1968": "מכבי תל אביב",
+        "1969": "הפועל תל אביב",
+        "1970": "מכבי תל אביב",
+        "1971": "מכבי נתניה",
+        "1972": "מכבי תל אביב",
+        "1973": "הכח רמת גן",
+        "1974": "מכבי נתניה",
+        "1975": "הפועל באר שבע",
+        "1976": "הפועל באר שבע",
+        "1977": "מכבי תל אביב",
+        "1978": "מכבי נתניה",
+        "1979": "מכבי תל אביב",
+        "1980": "מכבי נתניה",
+        "1981": "הפועל תל אביב",
+        "1982": "הפועל כפר סבא",
+        "1983": "מכבי נתניה",
+        "1984": "מכבי חיפה",
+        "1985": "מכבי חיפה",
+        "1986": "הפועל תל אביב",
+        "1987": "ביתר ירושלים",
+        "1988": "הפועל תל אביב",
+        "1989": "מכבי חיפה",
+        "1990": "בני יהודה",
+        "1991": "מכבי חיפה",
+        "1992": "מכבי תל אביב",
+        "1993": "ביתר ירושלים",
+        "1994": "מכבי חיפה",
+        "1995": "מכבי תל אביב",
+        "1996": "מכבי תל אביב",
+        "1997": "ביתר ירושלים",
+        "1998": "ביתר ירושלים",
+        "1999": "הפועל חיפה",
+        "2000": "הפועל תל אביב",
+        "2001": "מכבי חיפה",
+        "2002": "מכבי חיפה",
+        "2003": "מכבי תל אביב",
+        "2004": "מכבי חיפה",
+        "2005": "מכבי חיפה",
+        "2006": "מכבי חיפה",
+        "2007": "ביתר ירושלים",
+        "2008": "ביתר ירושלים",
+        "2009": "מכבי חיפה",
+        "2010": "הפועל תל אביב",
+        "2011": "מכבי חיפה",
+        "2012": "עירוני קריית שמונה",
+        "2013": "מכבי תל אביב",
+        "2014": "מכבי תל אביב",
+        "2015": "מכבי תל אביב",
+        "2016": "הפועל באר שבע",
+        "2017": "הפועל באר שבע",
+        "2018": "הפועל באר שבע",
+        "2019": "מכבי תל אביב",
+        "2020": "מכבי תל אביב"
+    }
+
+    let teamsToColors = {
+        "המשטרה הבריטית": "rgba(54, 162, 235, 1)",
+        "בני יהודה": "rgba(255, 159, 64, 1)",
+        "מכבי חיפה": "rgba(75, 192, 192, 1)",
+        "הכח רמת גן": "rgba(153, 102, 255, 1)",
+        "הפועל פתח תקווה": "rgba(54, 162, 235, 1)",
+        "הפועל באר שבע": "rgba(255, 99, 132, 1)",
+        "הפועל כפר סבא": "rgba(75, 192, 192, 1)",
+        "הפועל תל אביב": "rgba(255, 99, 132, 1)",
+        "ביתר ירושלים": "rgba(255, 206, 86, 1)",
+        "עירוני קריית שמונה": "rgba(54, 162, 235, 1)",
+        "מכבי נתניה": "rgba(255, 206, 86, 1)",
+        "הפועל חיפה": "rgba(255, 99, 132, 1)",
+        "מכבי תל אביב": "rgba(255, 206, 86, 1)",
+        "הפועל רמת גן": "rgba(255, 99, 132, 1)"
+    }
+    
+    let myChart = new Chart(ctx, {
+        type: 'horizontalBar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'מספר אליפויות',
+                data: [],
+                backgroundColor: []
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            title: {
+                display: true,
+                text: "",
+                fontSize: 16
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    const timer = ms => new Promise(res => setTimeout(res, ms));
+    let graphLabels = myChart.data.labels;
+    let graphData = myChart.data.datasets[0].data;
+    let graphColors = myChart.data.datasets[0].backgroundColor;
+
+    let teamsToIndexInData = {};
+
+    async function iterateYears() { 
+        for (const [year, team] of Object.entries(yearsToTeams)) {
+            console.log(`${year}: ${team}`);
+            
+            if (teamsToIndexInData.hasOwnProperty(team)) {
+                graphData[teamsToIndexInData[team]] += 1
+            } else {
+                graphLabels.push(team);
+                graphColors.push(teamsToColors[team]);
+                let teamIndex = graphLabels.length - 1;
+                teamsToIndexInData[team] = teamIndex
+                graphData[teamIndex] = 1
+            }
+            myChart.options.title.text = year;
+            myChart.update()
+            await timer(750); 
+        }
+    }
+
+    iterateYears();
+
+</script>
+</html>
