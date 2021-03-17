@@ -122,7 +122,7 @@
             datasets: [{
                 label: 'מספר אליפויות',
                 data: [],
-                backgroundColor: []
+                backgroundColor: context => teamsToColors[indexToTeamsInData[context.dataIndex]]
             }]
         },
         options: {
@@ -135,9 +135,10 @@
                 fontSize: 16
             },
             scales: {
-                yAxes: [{
+                xAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        precision: 0
                     }
                 }]
             }
@@ -147,23 +148,23 @@
     const timer = ms => new Promise(res => setTimeout(res, ms));
     let graphLabels = myChart.data.labels;
     let graphData = myChart.data.datasets[0].data;
-    let graphColors = myChart.data.datasets[0].backgroundColor;
 
     let teamsToIndexInData = {};
+    let indexToTeamsInData = {};
 
     async function iterateYears() { 
         for (const [year, team] of Object.entries(yearsToTeams)) {
-            console.log(`${year}: ${team}`);
-            
+            // console.log(`${year}: ${team}`);
             if (teamsToIndexInData.hasOwnProperty(team)) {
                 graphData[teamsToIndexInData[team]] += 1
             } else {
                 graphLabels.push(team);
-                graphColors.push(teamsToColors[team]);
                 let teamIndex = graphLabels.length - 1;
                 teamsToIndexInData[team] = teamIndex
+                indexToTeamsInData[teamIndex] = team
                 graphData[teamIndex] = 1
             }
+        
             myChart.options.title.text = year;
             myChart.update()
             await timer(750); 
