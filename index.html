@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=100, initial-scale=1.0">
     <title>תארים בתום כל עונה</title>
 </head>
+
 <body>
-    <canvas id="chart"></canvas>
+    <div id="graph-container" style="width: 75%; height: 600px;">
+        <canvas id="chart"></canvas>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
@@ -114,7 +118,7 @@
         "מכבי תל אביב": "rgba(255, 206, 86, 1)",
         "הפועל רמת גן": "rgba(255, 99, 132, 1)"
     }
-    
+
     let myChart = new Chart(ctx, {
         type: 'horizontalBar',
         data: {
@@ -124,10 +128,11 @@
                 data: [],
                 backgroundColor: context => {
                     return teamsToColors[indexToTeamsInData[context.dataIndex]]
-                    }
+                }
             }]
         },
         options: {
+            maintainAspectRatio: false,
             legend: {
                 display: false
             },
@@ -154,7 +159,7 @@
     let teamsToIndexInData = {};
     let indexToTeamsInData = {};
 
-    async function iterateYears() { 
+    async function iterateYears() {
         for (const [year, team] of Object.entries(yearsToTeams)) {
             // console.log(`${year}: ${team}`);
             if (teamsToIndexInData.hasOwnProperty(team)) {
@@ -166,11 +171,11 @@
                 indexToTeamsInData[teamIndex] = team
                 graphData[teamIndex] = 1
             }
-        
+
             myChart.options.title.text = year;
-            
+
             let sortableTempDict = Object.fromEntries(graphLabels.map((_, i) => [graphLabels[i], graphData[i]]))
-            sortedData = Object.entries(sortableTempDict).sort(([,a],[,b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+            sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
             myChart.data.labels = [];
             myChart.data.datasets[0].data = [];
             for (const [team, champs] of Object.entries(sortedData)) {
@@ -181,13 +186,14 @@
             }
 
             myChart.update()
-            await timer(750); 
+            await timer(750);
         }
     }
 
     iterateYears();
 
 </script>
+
 </html>
 
 
@@ -199,4 +205,3 @@ sortableTempDict = Object.entries(tempDict)
 .sort(([,a],[,b]) => a-b)
 .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
  -->
-
