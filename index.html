@@ -172,7 +172,9 @@
                 graphData[teamIndex] = 1
             }
 
-            myChart.options.title.text = year;
+            title = `מספר אליפויות בתום עונת ${year}`
+            myChart.options.title.text = title;
+            document.title = title;
 
             let sortableTempDict = Object.fromEntries(graphLabels.map((_, i) => [graphLabels[i], graphData[i]]))
             sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
@@ -195,13 +197,3 @@
 </script>
 
 </html>
-
-
-<!-- 
-graphData = [4, 2, 3]
-labels = ['b', 'c', 'a']
-tempDict = {'b': 4, 'c': 2, 'a': 3}
-sortableTempDict = Object.entries(tempDict)
-.sort(([,a],[,b]) => a-b)
-.reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
- -->
