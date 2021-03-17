@@ -122,7 +122,9 @@
             datasets: [{
                 label: 'מספר אליפויות',
                 data: [],
-                backgroundColor: context => teamsToColors[indexToTeamsInData[context.dataIndex]]
+                backgroundColor: context => {
+                    return teamsToColors[indexToTeamsInData[context.dataIndex]]
+                    }
             }]
         },
         options: {
@@ -166,6 +168,18 @@
             }
         
             myChart.options.title.text = year;
+            
+            let sortableTempDict = Object.fromEntries(graphLabels.map((_, i) => [graphLabels[i], graphData[i]]))
+            sortedData = Object.entries(sortableTempDict).sort(([,a],[,b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+            myChart.data.labels = [];
+            myChart.data.datasets[0].data = [];
+            for (const [team, champs] of Object.entries(sortedData)) {
+                myChart.data.labels.push(team)
+                myChart.data.datasets[0].data.push(champs)
+
+                indexToTeamsInData[myChart.data.labels.length - 1] = team
+            }
+
             myChart.update()
             await timer(750); 
         }
@@ -175,3 +189,14 @@
 
 </script>
 </html>
+
+
+<!-- 
+graphData = [4, 2, 3]
+labels = ['b', 'c', 'a']
+tempDict = {'b': 4, 'c': 2, 'a': 3}
+sortableTempDict = Object.entries(tempDict)
+.sort(([,a],[,b]) => a-b)
+.reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+ -->
+
