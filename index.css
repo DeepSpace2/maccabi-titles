@@ -1,0 +1,11 @@
+body {
+    background-color: #1e102e;
+}
+
+.container {
+    padding-top: 10px;
+}
+
+.graph-container {
+    height: 600px;
+}
