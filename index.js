@@ -33,7 +33,7 @@ async function iterateYears(data) {
     let teamsToColors = data["teams_colors"];
 
     let championshipsChart = new Chart(championshipsChartCanvas, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: [],
             datasets: [{
@@ -46,7 +46,7 @@ async function iterateYears(data) {
     });
     
     let cupsChart = new Chart(cupsChartCanvas, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: [],
             datasets: [{
