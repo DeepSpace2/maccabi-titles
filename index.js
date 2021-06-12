@@ -1,7 +1,7 @@
 let championshipsChartCanvas = document.getElementById("championships-chart");
 let cupsChartCanvas = document.getElementById("cups-chart");
 
-Chart.defaults.global.defaultFontColor = 'white';
+Chart.defaults.global.defaultFontColor = '#FFFFFFDE';
 Chart.defaults.global.defaultFontSize = 16;
 
 let graphOptions = {
