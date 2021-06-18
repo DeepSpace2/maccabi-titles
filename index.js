@@ -3,6 +3,15 @@ let cupsChartCanvas = document.getElementById("cups-chart");
 
 Chart.defaults.global.defaultFontColor = '#FFFFFFDE';
 Chart.defaults.global.defaultFontSize = 16;
+Chart.plugins.register(ChartDataLabels);
+Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
+    align: 'bottom',
+    anchor: 'end',
+    color: '#121212',
+    font: {
+        weight: 'bold'
+    }
+  });
 
 let graphOptions = {
     maintainAspectRatio: false,
@@ -14,11 +23,15 @@ let graphOptions = {
         text: ""
     },
     scales: {
-        xAxes: [{
+        yAxes: [{
             ticks: {
-                beginAtZero: true,
-                precision: 0
+                display: false
             },
+            gridLines: {
+                display: false
+            }
+        }],
+        xAxes: [{
             gridLines: {
                 display: false
             }
@@ -39,7 +52,13 @@ async function iterateYears(data) {
             datasets: [{
                 label: 'מספר אליפויות',
                 data: [],
-                backgroundColor: context => teamsToColors[championshipsIndexToTeamsInData[context.dataIndex]]
+                backgroundColor: context => {
+                    let teamColors = teamsToColors[championshipsIndexToTeamsInData[context.dataIndex]];
+                    if (!teamColors) {
+                        teamColors = "rgba(255, 255, 255, 1)";
+                    }
+                    return teamColors;
+                }
             }]
         },
         options: graphOptions
@@ -52,7 +71,13 @@ async function iterateYears(data) {
             datasets: [{
                 label: 'מספר גביעים',
                 data: [],
-                backgroundColor: context => teamsToColors[cupsIndexToTeamsInData[context.dataIndex]]
+                backgroundColor: context => {
+                    let teamColors = teamsToColors[cupsIndexToTeamsInData[context.dataIndex]];
+                    if (!teamColors) {
+                        teamColors = "rgba(255, 255, 255, 1)";
+                    }
+                    return teamColors;
+                }
             }]
         },
         options: graphOptions
@@ -100,7 +125,7 @@ async function iterateYears(data) {
         let cupHolder = yearData["cup"];
         if (cupHolder) {
             if (cupsTeamsToIndexInData.hasOwnProperty(cupHolder)) {
-                cupsGraphData[cupsTeamsToIndexInData[champion]] += 1
+                cupsGraphData[cupsTeamsToIndexInData[cupHolder]] += 1
             } else {
                 cupsGraphLabels.push(cupHolder);
                 teamIndex = cupsGraphLabels.length - 1;
