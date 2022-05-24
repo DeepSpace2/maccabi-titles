@@ -95,7 +95,14 @@ async function iterateYears(data) {
     let cupsTeamsToIndexInData = {};
     let cupsIndexToTeamsInData = {};
 
+    let {fromYear, toYear} = getQueryParams();
+    
     for (const [year, yearData] of Object.entries(yearsToTeams)) {
+
+        if ((fromYear && year < fromYear) || (toYear && year > toYear)) {
+            continue
+        }   
+
         let champion = yearData["champion"];
         if (champion) {
             if (championshipsTeamsToIndexInData.hasOwnProperty(champion)) {
@@ -155,4 +162,16 @@ async function iterateYears(data) {
 
 function loadData() {
     iterateYears(data)
+}
+
+
+function getQueryParams() {
+       let queryParams = window.location.search.substring(1).split("&");
+       let params = {};
+       for (let queryParam of queryParams ) {
+               let [key, value] =queryParam.split("=");
+               params[key] = value
+               
+       }
+       return params;
 }
