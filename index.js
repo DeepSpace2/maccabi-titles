@@ -1,10 +1,16 @@
-let championshipsChartCanvas = document.getElementById("championships-chart");
-let cupsChartCanvas = document.getElementById("cups-chart");
+let championshipsChartCanvas = document.getElementById("championships-chart").getContext("2d");
+let cupsChartCanvas = document.getElementById("cups-chart").getContext("2d");
 
-Chart.defaults.global.defaultFontColor = '#FFFFFFDE';
-Chart.defaults.global.defaultFontSize = 16;
-Chart.plugins.register(ChartDataLabels);
-Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
+let championshipsTeamsToIndexInData = {};
+let championshipsIndexToTeamsInData = {};
+
+let cupsTeamsToIndexInData = {};
+let cupsIndexToTeamsInData = {};
+
+Chart.defaults.color = '#FFFFFFDE';
+Chart.defaults.font.size = 16;
+Chart.register(ChartDataLabels);
+Chart.helpers.merge(Chart.defaults.plugins.datalabels, {
     align: 'bottom',
     anchor: 'end',
     color: '#121212',
@@ -13,29 +19,31 @@ Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
     }
   });
 
-let graphOptions = {
+var graphOptions = {
     maintainAspectRatio: false,
-    legend: {
-        display: false
-    },
-    title: {
-        display: true,
-        text: ""
+    plugins: {
+        legend: {
+            display: false
+        },
+        title: {
+            display: true,
+            text: ""
+        }
     },
     scales: {
-        yAxes: [{
+        y: {
             ticks: {
                 display: false
             },
             gridLines: {
                 display: false
             }
-        }],
-        xAxes: [{
+        },
+        x: {
             gridLines: {
                 display: false
             }
-        }]
+        }
     }
 }
 
@@ -90,10 +98,8 @@ async function iterateYears(data) {
     let cupsGraphData = cupsChart.data.datasets[0].data;
     
     
-    let championshipsTeamsToIndexInData = {};
-    let championshipsIndexToTeamsInData = {};
-    let cupsTeamsToIndexInData = {};
-    let cupsIndexToTeamsInData = {};
+
+    
 
     let {fromYear, toYear} = getQueryParams();
     
@@ -115,7 +121,7 @@ async function iterateYears(data) {
             }
         }
 
-        championshipsChart.options.title.text = `מספר אליפויות בתום עונת ${year}`;
+        championshipsChart.options.plugins.title.text = `מספר אליפויות בתום עונת ${year}`;
 
         let sortableTempDict = Object.fromEntries(championshipsGraphLabels.map((_, i) => [championshipsGraphLabels[i], championshipsGraphData[i]]))
         sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
@@ -141,7 +147,7 @@ async function iterateYears(data) {
             }
         }
 
-        cupsChart.options.title.text = `מספר גביעים בתום עונת ${year}`;
+        cupsChart.options.plugins.title.text = `מספר גביעים בתום עונת ${year}`;
 
         sortableTempDict = Object.fromEntries(cupsGraphLabels.map((_, i) => [cupsGraphLabels[i], cupsGraphData[i]]))
         sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
