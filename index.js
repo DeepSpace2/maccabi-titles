@@ -48,118 +48,85 @@ var graphOptions = {
 }
 
 
+function getTeamColors(teamsToColors, teamsData, dataIndex) {
+    let teamColors = teamsToColors[teamsData[dataIndex]];
+    if (!teamColors) {
+        teamColors = "rgba(255, 255, 255, 1)";
+    }
+    return teamColors;
+}
+
+function createChart(canvas, label, teamsToColors, teamsData) {
+    let chart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: label,
+                data: [],
+                backgroundColor: context => {
+                    return getTeamColors(teamsToColors, teamsData, context.dataIndex)
+                }
+            }]
+        },
+        options: graphOptions
+    });
+
+    return [
+        chart,
+        chart.data.labels,
+        chart.data.datasets[0].data
+    ];
+}
+
+function populateChart(chart, chartLabels, chartData, year, titleHolder, indexedData, titlePluralHebrewName) {
+    if (titleHolder) {
+        if (indexedData.hasOwnProperty(titleHolder)) {
+            chartData[indexedData[titleHolder]] += 1;
+        } else {
+            chartLabels.push(titleHolder);
+            let teamIndex = chartLabels.length - 1;
+            indexedData[titleHolder] = teamIndex;
+            chartData[teamIndex] = 1;
+        }
+    }
+
+    chart.options.plugins.title.text = `מספר ${titlePluralHebrewName} בתום עונת ${year}`;
+
+    let sortableTempDict = Object.fromEntries(chartLabels.map((_, i) => [chartLabels[i], chartData[i]]));
+    sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+    chart.data.labels = [];
+    chart.data.datasets[0].data = [];
+    for (const [team, numberOfTitles] of Object.entries(sortedData)) {
+        chart.data.labels.push(team);
+        chart.data.datasets[0].data.push(numberOfTitles);
+        indexedData[chart.data.labels.length - 1] = team;
+    }
+
+    chart.update();
+}
+
 async function iterateYears(data) {
 
     let yearsToTeams = data["titles"];
     let teamsToColors = data["teams_colors"];
-
-    let championshipsChart = new Chart(championshipsChartCanvas, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'מספר אליפויות',
-                data: [],
-                backgroundColor: context => {
-                    let teamColors = teamsToColors[championshipsIndexToTeamsInData[context.dataIndex]];
-                    if (!teamColors) {
-                        teamColors = "rgba(255, 255, 255, 1)";
-                    }
-                    return teamColors;
-                }
-            }]
-        },
-        options: graphOptions
-    });
     
-    let cupsChart = new Chart(cupsChartCanvas, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'מספר גביעים',
-                data: [],
-                backgroundColor: context => {
-                    let teamColors = teamsToColors[cupsIndexToTeamsInData[context.dataIndex]];
-                    if (!teamColors) {
-                        teamColors = "rgba(255, 255, 255, 1)";
-                    }
-                    return teamColors;
-                }
-            }]
-        },
-        options: graphOptions
-    });
+    let [ championshipsChart, championshipsChartLabels, championshipsChartData ] = createChart(championshipsChartCanvas, 'מספר אליפויות', teamsToColors, championshipsIndexToTeamsInData);
+    let [ cupsChart, cupsChartLabels, cupsChartData ] = createChart(cupsChartCanvas, 'מספר גביעים', teamsToColors, cupsIndexToTeamsInData);
     
     const timer = ms => new Promise(res => setTimeout(res, ms));
-    let championshipsGraphLabels = championshipsChart.data.labels;
-    let championshipsGraphData = championshipsChart.data.datasets[0].data;
-    let cupsGraphLabels = cupsChart.data.labels;
-    let cupsGraphData = cupsChart.data.datasets[0].data;
-    
-    
-
-    
 
     let {fromYear, toYear} = getQueryParams();
-    
+
     for (const [year, yearData] of Object.entries(yearsToTeams)) {
 
         if ((fromYear && year < fromYear) || (toYear && year > toYear)) {
-            continue
+            continue;
         }   
 
-        let champion = yearData["champion"];
-        if (champion) {
-            if (championshipsTeamsToIndexInData.hasOwnProperty(champion)) {
-                championshipsGraphData[championshipsTeamsToIndexInData[champion]] += 1
-            } else {
-                championshipsGraphLabels.push(champion);
-                let teamIndex = championshipsGraphLabels.length - 1;
-                championshipsTeamsToIndexInData[champion] = teamIndex
-                championshipsGraphData[teamIndex] = 1
-            }
-        }
+        populateChart(championshipsChart, championshipsChartLabels, championshipsChartData, year, yearData["champion"], championshipsIndexToTeamsInData, "אליפויות");
 
-        championshipsChart.options.plugins.title.text = `מספר אליפויות בתום עונת ${year}`;
-
-        let sortableTempDict = Object.fromEntries(championshipsGraphLabels.map((_, i) => [championshipsGraphLabels[i], championshipsGraphData[i]]))
-        sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-        championshipsChart.data.labels = [];
-        championshipsChart.data.datasets[0].data = [];
-        for (const [team, champs] of Object.entries(sortedData)) {
-            championshipsChart.data.labels.push(team)
-            championshipsChart.data.datasets[0].data.push(champs)
-            championshipsIndexToTeamsInData[championshipsChart.data.labels.length - 1] = team
-        }
-
-        championshipsChart.update()
-
-        let cupHolder = yearData["cup"];
-        if (cupHolder) {
-            if (cupsTeamsToIndexInData.hasOwnProperty(cupHolder)) {
-                cupsGraphData[cupsTeamsToIndexInData[cupHolder]] += 1
-            } else {
-                cupsGraphLabels.push(cupHolder);
-                teamIndex = cupsGraphLabels.length - 1;
-                cupsTeamsToIndexInData[cupHolder] = teamIndex
-                cupsGraphData[teamIndex] = 1
-            }
-        }
-
-        cupsChart.options.plugins.title.text = `מספר גביעים בתום עונת ${year}`;
-
-        sortableTempDict = Object.fromEntries(cupsGraphLabels.map((_, i) => [cupsGraphLabels[i], cupsGraphData[i]]))
-        sortedData = Object.entries(sortableTempDict).sort(([, a], [, b]) => b - a).reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-        cupsChart.data.labels = [];
-        cupsChart.data.datasets[0].data = [];
-        for (const [team, cups] of Object.entries(sortedData)) {
-            cupsChart.data.labels.push(team)
-            cupsChart.data.datasets[0].data.push(cups)
-            cupsIndexToTeamsInData[cupsChart.data.labels.length - 1] = team
-        }
-
-        cupsChart.update()
+        populateChart(cupsChart, cupsChartLabels, cupsChartData, year, yearData["cup"], cupsIndexToTeamsInData, "גביעים");
 
         await timer(750);
     }
@@ -167,7 +134,7 @@ async function iterateYears(data) {
 
 
 function loadData() {
-    iterateYears(data)
+    iterateYears(data);
 }
 
 
